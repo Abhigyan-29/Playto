@@ -28,6 +28,11 @@ export default function Dashboard({ merchantId: initialMerchantId }) {
       .then(data => setMerchants(data))
       .catch(err => console.error('Error fetching merchants:', err));
   }, []);
+  useEffect(() => {
+  if (window.location.search.includes("__clerk_handshake")) {
+    window.history.replaceState({}, document.title, "/dashboard");
+  }
+}, []);
 
   const fetchDashboard = async () => {
     if (!selectedMerchantId) return;
