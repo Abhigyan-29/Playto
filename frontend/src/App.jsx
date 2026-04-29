@@ -23,7 +23,7 @@ function AppContent() {
   const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/v1/merchants`)
+    fetch('https://playto-3-0se5.onrender.com/api/v1/merchants')
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch merchants');
         return res.json();
