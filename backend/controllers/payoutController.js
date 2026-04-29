@@ -18,7 +18,6 @@ async function requestPayout(req, res) {
   try {
     await client.query('BEGIN');
 
-    // 1. Lock the merchant to prevent concurrent overlapping requests
     const merchantRes = await client.query(
       'SELECT id FROM merchants WHERE id = $1 FOR UPDATE',
       [merchant_id]
@@ -29,7 +28,6 @@ async function requestPayout(req, res) {
       return res.status(404).json({ error: 'Merchant not found' });
     }
 
-    // 2. Check for idempotency key
     const idKeyRes = await client.query(
       'SELECT response_body FROM idempotency_keys WHERE merchant_id = $1 AND key = $2 AND expires_at > NOW()',
       [merchant_id, idempotencyKey]
@@ -40,7 +38,6 @@ async function requestPayout(req, res) {
       return res.status(200).json(idKeyRes.rows[0].response_body);
     }
 
-    // 2b. Analyze Risk (Backend Intelligence)
     const riskResult = await analyzePayoutRisk(merchant_id, amount_paise);
     if (riskResult.risk_score > 0.85) {
       await client.query('ROLLBACK');
@@ -54,7 +51,6 @@ async function requestPayout(req, res) {
     const riskScore = riskResult.risk_score;
     const riskAssessment = JSON.stringify(riskResult);
 
-    // 3. Calculate balance (database-level calculation)
     const balanceRes = await client.query(`
       SELECT COALESCE(
         SUM(CASE WHEN type = 'CREDIT' THEN amount_paise ELSE -amount_paise END), 0
@@ -78,7 +74,6 @@ async function requestPayout(req, res) {
       return res.status(400).json(errorResp);
     }
 
-    // 4. Create payout
     const payoutRes = await client.query(`
       INSERT INTO payouts (merchant_id, amount_paise, bank_account_id, status, idempotency_key, risk_score, risk_assessment)
       VALUES ($1, $2, $3, 'PENDING', $4, $5, $6)
@@ -87,7 +82,6 @@ async function requestPayout(req, res) {
 
     const payout = payoutRes.rows[0];
 
-    // 5. Debit the ledger to hold the funds
     await client.query(`
       INSERT INTO ledger_entries (merchant_id, amount_paise, type, payout_id)
       VALUES ($1, $2, 'DEBIT', $3)
@@ -101,7 +95,6 @@ async function requestPayout(req, res) {
       }
     };
 
-    // 6. Save idempotency key
     await client.query(`
       INSERT INTO idempotency_keys (key, merchant_id, response_body, expires_at)
       VALUES ($1, $2, $3, NOW() + INTERVAL '24 hours')
@@ -166,6 +159,7 @@ async function getMerchants(req, res) {
     const merchants = await db.query('SELECT id, name FROM merchants');
     res.json(merchants.rows);
   } catch (error) {
+    console.error('Error fetching merchants:', error); // ← fix
     res.status(500).json({ error: 'Internal server error' });
   }
 }
