@@ -37,7 +37,7 @@ export default function Dashboard({ merchantId: initialMerchantId }) {
   const fetchDashboard = async () => {
     if (!selectedMerchantId) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/v1/merchants/${selectedMerchantId}/dashboard`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/merchants/${merchantId}/dashboard`);
       if (!response.ok) throw new Error('Failed to fetch dashboard data');
       const data = await response.json();
       setDashboardData(data);
