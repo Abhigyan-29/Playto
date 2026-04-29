@@ -5,11 +5,8 @@ const path = require('path');
 
 async function setup() {
   const appClient = new Client({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
+    connectionString: 'postgresql://playto_db_b1p8_user:1phkWr9YCBUZlr9hlbfafie82aYcO326@dpg-d7odfnjeo5us73bui9pg-a/playto_db_b1p8',
+    ssl: { rejectUnauthorized: false }
   });
 
   try {
