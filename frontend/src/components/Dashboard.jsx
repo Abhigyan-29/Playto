@@ -6,7 +6,7 @@ import { useAuth, useUser, UserButton, useClerk } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-export default function Dashboard({ merchantId: initialMerchantId }) {
+export default function Dashboard({ merchantId }){
   const { isDark } = useTheme();
   const [merchants, setMerchants] = useState([]);
   const [selectedMerchantId, setSelectedMerchantId] = useState(initialMerchantId);
