@@ -23,7 +23,7 @@ export default function Dashboard({ merchantId: initialMerchantId }) {
 
   useEffect(() => {
     // Fetch all merchants for the switcher
-    fetch('http://localhost:3000/api/v1/merchants')
+    fetch('https://playto-3-0se5.onrender.com')
       .then(res => res.json())
       .then(data => setMerchants(data))
       .catch(err => console.error('Error fetching merchants:', err));
