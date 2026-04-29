@@ -27,7 +27,7 @@ export default function AIChatbot() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/ai/chat', {
+      const response = await fetch('https://playto-3-0se5.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
