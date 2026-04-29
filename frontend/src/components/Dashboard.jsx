@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 export default function Dashboard({ merchantId }){
   const { isDark } = useTheme();
   const [merchants, setMerchants] = useState([]);
-  const [selectedMerchantId, setSelectedMerchantId] = useState(initialMerchantId);
+  const [selectedMerchantId, setSelectedMerchantId] = useState(merchantId);
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ export default function Dashboard({ merchantId }){
 
   useEffect(() => {
     // Fetch all merchants for the switcher
-    fetch('https://playto-3-0se5.onrender.com')
+fetch(`${import.meta.env.VITE_API_URL}/api/v1/merchants`)
       .then(res => res.json())
       .then(data => setMerchants(data))
       .catch(err => console.error('Error fetching merchants:', err));
@@ -37,8 +37,8 @@ export default function Dashboard({ merchantId }){
   const fetchDashboard = async () => {
     if (!selectedMerchantId) return;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/merchants/${merchantId}/dashboard`);
-      if (!response.ok) throw new Error('Failed to fetch dashboard data');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/merchants/${selectedMerchantId}/dashboard`);
+      if (!response.ok) throw new Error('Failed to  dashboard data');
       const data = await response.json();
       setDashboardData(data);
       setError(null);
@@ -73,7 +73,7 @@ export default function Dashboard({ merchantId }){
     const idempotencyKey = crypto.randomUUID();
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/payouts', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/payouts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
